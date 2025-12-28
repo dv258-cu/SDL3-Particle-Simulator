@@ -5,42 +5,64 @@
 
 #define FRAMERATE 60.0
 
-
+// Globalize window and renderer
 SDL_Window *window      = NULL;
 SDL_Renderer *renderer  = NULL;
 
-SDL_FRect *rectangle    = NULL;
+// Basic animation rectangles
+SDL_FRect *player       = NULL;
 
+// Framerate globals
 Uint64 NOW;
 Uint64 LAST;
 double deltaTime;
 
+char dir = -1;
+
+// Called on every frame
 void update_frame() {
+    // 1. Calculate Delta Time
     LAST = NOW;
     NOW = SDL_GetPerformanceCounter();
-    
-    rectangle->x += 0.5 * deltaTime;
-    rectangle->y += 1 * deltaTime;
-    SDL_RenderRect(renderer, rectangle);
-    SDL_RenderPresent(renderer);
+    deltaTime = (double)((NOW - LAST) / (double)SDL_GetPerformanceFrequency()) * FRAMERATE;
 
-    deltaTime = (double)(((NOW - LAST) / (double)SDL_GetPerformanceFrequency())) * FRAMERATE;
-    return;
+    // 2. Clear the entire screen (The "Eraser")
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black
+    SDL_RenderClear(renderer);
+
+    // 3. Update Physics Logic
+    float xvel = 1.0f;
+    // Simple bounce logic (simplified for example)
+    if (player->x >= 630 || player->x <= 0) { 
+        
+    }
+    
+    player->x += xvel * deltaTime;
+
+    // 4. Draw the Player
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White
+    SDL_RenderFillRect(renderer, player); // Use FillRect for a solid box
+
+    // 5. Present EVERYTHING at once (The "Flip")
+    SDL_RenderPresent(renderer);
 }
 
+// Called on start
 void on_init() {
     NOW = SDL_GetPerformanceCounter();
     LAST = 0;
     deltaTime = 0;
 
-    rectangle = malloc(sizeof(SDL_FRect));
-    rectangle->x = 10;
-    rectangle->y = 10;
-    rectangle->w = 100;
-    rectangle->h = 100;
-    SDL_SetRenderDrawColor(renderer, 100, 0, 0, 255);
+    player = malloc(sizeof(SDL_FRect));
+    player->x = 0;
+    player->y = 240;
+    player->w = 10;
+    player->h = 10;
 
-    
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderRect(renderer, player);
+    SDL_RenderPresent(renderer);
+
     return;
 }
 
