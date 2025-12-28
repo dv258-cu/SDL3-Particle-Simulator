@@ -15,12 +15,49 @@ SDL_Window *window      = NULL;
 SDL_Renderer *renderer  = NULL;
 
 // Basic animation rectangles
-SDL_FRect *player       = NULL;
+SDL_FRect *player = NULL;
+
+typedef struct {
+    SDL_FRect *rect;
+    Uint32 color;
+    bool fill;
+} SimRect;
 
 // Framerate globals
 Uint64 NOW;
 Uint64 LAST;
 double deltaTime;
+
+// Particle Globals
+SimRect *particle = NULL;
+
+void Init_SimRect() {
+    particle          = malloc(sizeof(SimRect));
+    particle->rect    = malloc(sizeof(SDL_FRect));
+    particle->rect->x = 315;
+    particle->rect->y = 235;
+    particle->rect->w = 100;
+    particle->rect->h = 100;
+
+    particle->color = 0xFFFFFFFF;
+    particle->fill  = true;
+}
+
+void Draw_SimRect() {
+    Uint8 r = (particle->color >> 24) & 0xFF;
+    Uint8 g = (particle->color >> 16) & 0xFF;
+    Uint8 b = (particle->color >>  8) & 0xFF;
+    Uint8 a = (particle->color >>  0) & 0xFF;
+
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+
+    if (particle->fill) {
+        SDL_RenderFillRect(renderer, particle->rect);
+    }
+    else {
+        SDL_RenderRect(renderer, particle->rect);
+    }
+}
 
 // Called on every frame
 void update_frame() {
@@ -29,48 +66,17 @@ void update_frame() {
     NOW = SDL_GetPerformanceCounter();
     deltaTime = (double)((NOW - LAST) / (double)SDL_GetPerformanceFrequency()) * FRAMERATE;
 
-    // 2. Clear the entire screen (The "Eraser")
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black
-    SDL_RenderClear(renderer);
-
-
-    const float r = 20.0f;
-    const float f = 0.1f;
-
-    float theta = 2 * PI * f * SDL_GetTicks() * deltaTime;
-
-    // 3. Update Physics Logic
-    float xvel = r * cos(theta);
-    float yvel = r * sin(theta);
     
-    player->x += xvel * deltaTime;
-    player->y += yvel * deltaTime;
 
-    // 4. Draw the Player
-    SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255); // White
-    SDL_RenderFillRect(renderer, player); // Use FillRect for a solid box
-
-    // 5. Present EVERYTHING at once (The "Flip")
+    Draw_SimRect();
     SDL_RenderPresent(renderer);
 }
 
-// Called on start
-void on_init() {
+// Initializes timer for time between frames
+void init_dt() {
     NOW = SDL_GetPerformanceCounter();
     LAST = 0;
     deltaTime = 0;
-
-    player = malloc(sizeof(SDL_FRect));
-    player->x = 315;
-    player->y = 235;
-    player->w = 10;
-    player->h = 10;
-
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderRect(renderer, player);
-    SDL_RenderPresent(renderer);
-
-    return;
 }
 
 int main(int argc, char* argv[]) {
@@ -85,13 +91,14 @@ int main(int argc, char* argv[]) {
 
     // 2. Create a Window and a Renderer
     // This opens a 800x600 window with the title "SDL3 Window"
-    if (!SDL_CreateWindowAndRenderer("SDL3 Window", 640, 480, 0, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("SDL3 Particle Simulator", 640, 480, 0, &window, &renderer)) {
         SDL_Log("Window/Renderer creation failed: %s", SDL_GetError());
         SDL_Quit();
         return 1;
     }
 
-    on_init();
+    init_dt();
+    Init_SimRect();
 
     // 3. Main Loop
     while (!quit) {
@@ -100,7 +107,12 @@ int main(int argc, char* argv[]) {
             if (event.type == SDL_EVENT_QUIT || event.key.key == SDLK_ESCAPE) {
                 quit = true;
             }
+            if (event.key.key == SDLK_SPACE) {
+                particle->color = particle->color * 0.9;
+            }
         }
+
+        
 
         update_frame();
     }
