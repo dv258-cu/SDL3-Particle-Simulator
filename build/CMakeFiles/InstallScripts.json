@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/cmake_install.cmake",
+		"C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

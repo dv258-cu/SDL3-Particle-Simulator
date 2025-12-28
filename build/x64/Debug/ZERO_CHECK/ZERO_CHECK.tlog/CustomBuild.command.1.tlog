@@ -1,0 +1,10 @@
+^C:\USERS\VIGNA\DESKTOP\DANI\PROJECTS\SDL3-PARTICLE-SIMULATOR\BUILD\CMAKEFILES\367420E57D6A223F96F4DCCBB6440531\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator -BC:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/SDL3-PARTICLE-SIMULATOR.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
