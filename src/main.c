@@ -1,9 +1,14 @@
+// C standard libraries
 #include <stdio.h>
+#include <math.h>
+
+// SDL3
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
 
 #define FRAMERATE 60.0
+#define PI 3.14159265358979
 
 // Globalize window and renderer
 SDL_Window *window      = NULL;
@@ -17,8 +22,6 @@ Uint64 NOW;
 Uint64 LAST;
 double deltaTime;
 
-char dir = -1;
-
 // Called on every frame
 void update_frame() {
     // 1. Calculate Delta Time
@@ -30,17 +33,21 @@ void update_frame() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Black
     SDL_RenderClear(renderer);
 
+
+    const float r = 20.0f;
+    const float f = 0.1f;
+
+    float theta = 2 * PI * f * SDL_GetTicks() * deltaTime;
+
     // 3. Update Physics Logic
-    float xvel = 1.0f;
-    // Simple bounce logic (simplified for example)
-    if (player->x >= 630 || player->x <= 0) { 
-        
-    }
+    float xvel = r * cos(theta);
+    float yvel = r * sin(theta);
     
     player->x += xvel * deltaTime;
+    player->y += yvel * deltaTime;
 
     // 4. Draw the Player
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White
+    SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255); // White
     SDL_RenderFillRect(renderer, player); // Use FillRect for a solid box
 
     // 5. Present EVERYTHING at once (The "Flip")
@@ -54,8 +61,8 @@ void on_init() {
     deltaTime = 0;
 
     player = malloc(sizeof(SDL_FRect));
-    player->x = 0;
-    player->y = 240;
+    player->x = 315;
+    player->y = 235;
     player->w = 10;
     player->h = 10;
 
