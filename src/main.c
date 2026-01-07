@@ -28,6 +28,7 @@ SDL_FRect *player = NULL;
 
 typedef struct {
     SDL_FRect *rect;
+    float bounciness;
     Uint32 color;
     bool fill;
 } SimRect;
@@ -49,7 +50,8 @@ void Init_SimRect() {
     particle->rect->h = 100;
 
     particle->color = WHITE;
-    particle->fill  = true;
+    particle->bounciness = 0.75;
+    particle->fill  = false;
 }
 
 
@@ -73,26 +75,24 @@ void Draw_SimRect() {
 
 }
 
-int frameHolder = 0;
-void Animate_SimRect(float xvel, float yvel) {
+float xvel = 5;
+float yvel = 0;
+void Animate_SimRect() {
+
+    // Temporary position storage variables
     float xpos = particle->rect->x;
     float ypos = particle->rect->y;
 
+    // Bounce logic
     bool hitsWall = xpos >= 540 || xpos <= 0;
 
-    if (frameHolder > 10) {
-        if(hitsWall) {
-            xvel *= -1;
-            yvel *= -1;
-
-            frameHolder = 0;
-        }
+    if (hitsWall) {
+        xvel *= -1;
+        particle->rect->x += xvel * particle->bounciness;
     }
 
-    else { frameHolder++; }
-
     particle->rect->x += xvel * deltaTime;
-    particle->rect->x += xvel * deltaTime;
+    particle->rect->x += yvel * deltaTime;
 }
 
 // Called on every frame
@@ -105,7 +105,7 @@ void update_frame() {
     
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    Animate_SimRect(1, 0);
+    Animate_SimRect();
     Draw_SimRect();
     SDL_RenderPresent(renderer);
 }
@@ -122,6 +122,7 @@ static int UserInput(void *ptr) {
 }
 
 int main(int argc, char* argv[]) {
+    bool animateColors = true;
     bool quit = false;
     SDL_Event event;
 
@@ -163,9 +164,16 @@ int main(int argc, char* argv[]) {
 
                 particle->color = pscolor;
             }
+            if (event.key.key == SDLK_F) { particle->fill = !particle->fill; }
         }
 
         
+        if (animateColors) {
+            Uint32 rand_color = SDL_rand(0x00FFFFFF);
+            rand_color = (rand_color << 8) + 0xFF;
+
+            particle->color = rand_color;
+        }
 
         update_frame();
     }
