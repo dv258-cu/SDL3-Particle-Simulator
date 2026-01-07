@@ -89,10 +89,10 @@ void Animate_SimRect(float xvel, float yvel) {
         }
     }
 
-    particle->rect->x += xvel * deltaTime;
-    particle->rect->x += xvel * deltaTime;
+    else { frameHolder++; }
 
-    frameHolder++;
+    particle->rect->x += xvel * deltaTime;
+    particle->rect->x += xvel * deltaTime;
 }
 
 // Called on every frame
