@@ -65,7 +65,7 @@ int RenderingThread(void* data) {
         now = SDL_GetPerformanceCounter();
         double deltaTime = (double)((now - last) / (double)SDL_GetPerformanceFrequency());
 
-        SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 255, 255);
+        SDL_SetRenderDrawColor(ctx->renderer, 0, 0, 0, 255);
         SDL_RenderClear(ctx->renderer);
 
         for (Uint64 i = 0; i < PARTICLE_COUNT; i++) {
@@ -112,9 +112,9 @@ int main(int argc, char* argv[]) {
     if (!SDL_Init(SDL_INIT_VIDEO)) return 1;
 
     RenderContext ctx;
-    if (!SDL_CreateWindowAndRenderer("SDL3 Particle Simulation", SIM_WIDTH, SIM_HEIGHT, 0, &ctx.window, &ctx.renderer)) {
-        return 1;
-    }
+    if (!SDL_CreateWindowAndRenderer("SDL3 Particle Simulation", SIM_WIDTH, SIM_HEIGHT, SDL_WINDOW_BORDERLESS, &ctx.window, &ctx.renderer)) {
+    return 1;
+}
 
     SDL_srand(0);
 
