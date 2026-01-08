@@ -11,5 +11,6 @@
 ## Next Steps
 ------------------------
 #### Change rectangles to circles
-#### Set particle spawn location
-#### Add multiple particles
+#### Set particle spawn location [x]
+#### Add multiple particles [x]
+#### Multithreading -> Rendering [x], Physics, User Input [x]
