@@ -123,27 +123,9 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>	Copying executable to project root...	Copying SDL3.dll to project root...</Message>
+      <Message></Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/Debug/SDL3.dll C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/Debug
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/Debug/SDL3-PARTICLE-SIMULATOR.exe C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/Debug/SDL3.dll C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -210,27 +192,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>	Copying executable to project root...	Copying SDL3.dll to project root...</Message>
+      <Message></Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/Release/SDL3.dll C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/Release
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/Release/SDL3-PARTICLE-SIMULATOR.exe C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/Release/SDL3.dll C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -297,27 +261,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>	Copying executable to project root...	Copying SDL3.dll to project root...</Message>
+      <Message></Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/MinSizeRel/SDL3.dll C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/MinSizeRel
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/MinSizeRel/SDL3-PARTICLE-SIMULATOR.exe C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/MinSizeRel/SDL3.dll C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -383,27 +329,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>	Copying executable to project root...	Copying SDL3.dll to project root...</Message>
+      <Message></Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/RelWithDebInfo/SDL3.dll C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/RelWithDebInfo
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/RelWithDebInfo/SDL3-PARTICLE-SIMULATOR.exe C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_if_different C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/RelWithDebInfo/SDL3.dll C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
