@@ -1,7 +1,9 @@
-# Download Instructions
--------------------------
-### Should be plug and play on any Win32
-### exe is in build/debug
+#SDL3 Graphical Particle Simulation
+
+## Download Instructions
+
+#### Should be plug and play on any Win32
+#### exe is in build/debug
 
 ## Current Functionality
 
