@@ -1,4 +1,4 @@
-#SDL3 Graphical Particle Simulation
+# SDL3 Graphical Particle Simulation
 
 ## Download Instructions
 
