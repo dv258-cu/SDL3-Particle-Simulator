@@ -1,151 +1,147 @@
-// C standard libraries
 #include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-
-// SDL3
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
-#define FRAMERATE 60.0 // Adjusted for smoother motion
-#define PI 3.14159265358979
+#define SIM_WIDTH 1920
+#define SIM_HEIGHT 1080
+#define PARTICLE_COUNT 20000
+#define GRAVITY 5
+#define BOUNCINESS 0.75
+#define FLOOR 50
 
-// Basic Color Defines (Hex: RRGGBBAA)
-#define WHITE      0xFFFFFFFF
-#define BLACK      0x000000FF
-
-// Globalize window and sim_renderer
-SDL_Window *window          = NULL;
-SDL_Renderer *sim_renderer  = NULL;
-SDL_Window *gui_window      = NULL;
-SDL_Renderer *gui_renderer  = NULL;
+typedef enum {
+    TOP_LEFT,
+    TOP_CENTER,
+    TOP_RIGHT,
+    MID_LEFT,
+    MID_CENTER,
+    MID_RIGHT
+} ParticleStartLocation;
 
 typedef struct {
-    SDL_FRect rect;      // Changed to a struct, not a pointer, to simplify memory
-    float bounciness;
-    Uint32 color;
-    bool fill;
+    SDL_FRect rect;
     float xvel;
     float yvel;
+    Uint32 color;
+    bool fill;
 } SimRect;
 
-// Framerate globals
-Uint64 NOW;
-Uint64 LAST;
-double deltaTime;
+typedef struct {
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    SDL_AtomicInt running; 
+    SimRect* cells[PARTICLE_COUNT];
+} RenderContext;
 
-// Particle Globals
-SimRect cell; // Allocated on stack for simplicity
-SimRect cell2;
+void UpdatePhysics(SimRect* p, double dt) {
+    p->yvel += GRAVITY;
 
-void Init_SimRect(SimRect* particle, Uint16 particle_start_x, Uint16 particle_start_y, Uint8 particle_width, Uint8 particle_height, Uint32 particle_color) {
-    particle->rect.x = particle_start_x;
-    particle->rect.y = particle_start_y;
-    particle->rect.w = particle_width;
-    particle->rect.h = particle_height;
-    particle->xvel   = 300.0f;
-    particle->yvel   = 0.0f;
+    p->rect.x += (float)(p->xvel * dt);
+    p->rect.y += (float)(p->yvel * dt);
 
-    particle->color = particle_color;
-    particle->bounciness = 0.75;
-    particle->fill = false;
-}
-
-void Draw_SimRect(SimRect* particle) {
-    Uint8 r = (particle->color >> 24) & 0xFF;
-    Uint8 g = (particle->color >> 16) & 0xFF;
-    Uint8 b = (particle->color >>  8) & 0xFF;
-    Uint8 a = (particle->color >>  0) & 0xFF;
-
-    SDL_SetRenderDrawColor(sim_renderer, r, g, b, a);
-
-    if (particle->fill) {
-        SDL_RenderFillRect(sim_renderer, &particle->rect);
-    } else {
-        SDL_RenderRect(sim_renderer, &particle->rect);
+    // X-axis bounce
+    if (p->rect.x + p->rect.w >= SIM_WIDTH || p->rect.x <= 0) {
+        p->xvel *= -1 * BOUNCINESS;
+        p->rect.x = SDL_clamp(p->rect.x, 0, SIM_WIDTH - p->rect.w);
     }
-}
-
-void Animate_SimRect(SimRect* particle) {
-    // Bounce logic (Window width is 640)
-    if (particle->rect.x + particle->rect.w >= 640 || particle->rect.x <= 0) {
-        particle->xvel *= -1;
-        // Move it slightly away from wall to prevent "stucking"
-        particle->rect.x += (particle->xvel * 0.01f); 
+    // Y-axis bounce
+    if (p->rect.y + p->rect.h >= SIM_HEIGHT - FLOOR || p->rect.y <= 0) {
+        p->yvel *= -1 * BOUNCINESS;
+        p->rect.y = SDL_clamp(p->rect.y, 0, SIM_HEIGHT - p->rect.h - FLOOR);
     }
 
-    // Standard movement
-    particle->rect.x += (float)(particle->xvel * deltaTime);
-    particle->rect.y += (float)(particle->yvel * deltaTime);
 }
 
-void update_frame() {
-    // Calculate Delta Time
-    LAST = NOW;
-    NOW = SDL_GetPerformanceCounter();
-    deltaTime = (double)((NOW - LAST) / (double)SDL_GetPerformanceFrequency());
+int RenderingThread(void* data) {
+    RenderContext* ctx = (RenderContext*)data;
+    Uint64 now = SDL_GetPerformanceCounter();
+    Uint64 last = 0;
 
-    // Clear Screen (Black background)
-    SDL_SetRenderDrawColor(sim_renderer, 255, 255, 255, 255);
-    SDL_RenderClear(sim_renderer);
+    // VSync is important in a separate thread to prevent 100% CPU usage
+    SDL_SetRenderVSync(ctx->renderer, 1);
 
-    // Update and Draw
-    Animate_SimRect(&cell);
-    Animate_SimRect(&cell2);
-    Draw_SimRect(&cell);
-    Draw_SimRect(&cell2);
+    while (SDL_GetAtomicInt(&ctx->running)) {
+        last = now;
+        now = SDL_GetPerformanceCounter();
+        double deltaTime = (double)((now - last) / (double)SDL_GetPerformanceFrequency());
 
-    SDL_RenderPresent(sim_renderer);
+        SDL_SetRenderDrawColor(ctx->renderer, 255, 255, 255, 255);
+        SDL_RenderClear(ctx->renderer);
+
+        for (Uint64 i = 0; i < PARTICLE_COUNT; i++) {
+            SimRect* p = ctx->cells[i];
+            
+            // 1. Update
+            UpdatePhysics(p, deltaTime);
+
+            // 2. Draw
+            Uint32 c = p->color;
+            SDL_SetRenderDrawColor(ctx->renderer, (c>>24)&0xFF, (c>>16)&0xFF, (c>>8)&0xFF, c&0xFF);
+            
+            if (p->fill) SDL_RenderFillRect(ctx->renderer, &p->rect);
+            else SDL_RenderRect(ctx->renderer, &p->rect);
+        }
+
+        SDL_RenderPresent(ctx->renderer);
+    }
+    return 0;
+}
+
+void InitParticles(SimRect p[PARTICLE_COUNT], ParticleStartLocation loc) {
+    float startX = 0, startY = 0;
+
+    switch(loc) {
+        case TOP_LEFT:   startX = 10; startY = 10; break;
+        case TOP_CENTER: startX = SIM_WIDTH/2; startY = 10; break;
+        case TOP_RIGHT:  startX = SIM_WIDTH-20; startY = 10; break;
+        case MID_CENTER: startX = SIM_WIDTH/2; startY = SIM_HEIGHT/2; break;
+        default:         startX = 100; startY = 100; break;
+    }
+
+    for (Uint64 i = 0; i < PARTICLE_COUNT; i++) {
+        p[i].rect = (SDL_FRect){startX, startY, 5.0f, 5.0f};
+        // Give each particle a unique random velocity
+        p[i].xvel = (float)((SDL_rand(1000) - 500)); 
+        p[i].yvel = (float)((SDL_rand(1000) - 500));
+        p[i].color = (SDL_rand(0xFFFFFF) << 8) | 0xFF;
+        p[i].fill = true;
+    }
 }
 
 int main(int argc, char* argv[]) {
-    bool quit = false;
+    if (!SDL_Init(SDL_INIT_VIDEO)) return 1;
+
+    RenderContext ctx;
+    if (!SDL_CreateWindowAndRenderer("SDL3 Particle Simulation", SIM_WIDTH, SIM_HEIGHT, 0, &ctx.window, &ctx.renderer)) {
+        return 1;
+    }
+
+    SDL_srand(0);
+
+    SimRect particles[PARTICLE_COUNT];
+    InitParticles(particles, MID_CENTER);
+
+    for (Uint64 i = 0; i < PARTICLE_COUNT; i++) {
+        ctx.cells[i] = &particles[i];
+    }
+
+    SDL_SetAtomicInt(&ctx.running, 1);
+    SDL_Thread* renderThread = SDL_CreateThread(RenderingThread, "RenderThread", &ctx);
+
     SDL_Event event;
-
-    // 1. Initialize SDL
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
-        return 1;
-    }
-
-    // 2. Create Window and sim_Renderer
-    if (!SDL_CreateWindowAndRenderer("SDL3 Particle Simulator", 640, 480, 0, &window, &sim_renderer)) {
-        SDL_Quit();
-        return 1;
-    }
-
-    if (!SDL_CreateWindowAndRenderer("SDL3 Particle Simulator GUI", 320, 480, 0, &gui_window, &gui_renderer)) {
-        SDL_Quit();
-        return 1;
-    }
-
-    // Initialize VSync
-    SDL_SetRenderVSync(sim_renderer, 1);
-
-    NOW = SDL_GetPerformanceCounter();
-    Init_SimRect(&cell, 0, 0, 10, 10, BLACK);
-    Init_SimRect(&cell2, 0, 20, 10, 10, BLACK);
-
-    // 3. Main Loop
-    while (!quit) {
+    while (SDL_GetAtomicInt(&ctx.running)) {
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_QUIT) {
-                quit = true;
-            }
+            if (event.type == SDL_EVENT_QUIT) SDL_SetAtomicInt(&ctx.running, 0);
             if (event.type == SDL_EVENT_KEY_DOWN) {
-                if (event.key.key == SDLK_ESCAPE) quit = true;
-                if (event.key.key == SDLK_SPACE)  cell.color = (SDL_rand(0xFFFFFF) << 8) | 0xFF;
-                if (event.key.key == SDLK_F)      cell.fill = !cell.fill;
-                if (event.key.key == SDLK_R)      cell.color = WHITE;
+                if (event.key.key == SDLK_ESCAPE) SDL_SetAtomicInt(&ctx.running, 0);
+                if (event.key.key == SDLK_SPACE) InitParticles(particles, TOP_CENTER);
             }
         }
-
-        update_frame();
     }
 
-    // 4. Cleanup
-    SDL_DestroyRenderer(sim_renderer);
-    SDL_DestroyWindow(window);
+    SDL_WaitThread(renderThread, NULL);
+    SDL_DestroyRenderer(ctx.renderer);
+    SDL_DestroyWindow(ctx.window);
     SDL_Quit();
-
     return 0;
 }
