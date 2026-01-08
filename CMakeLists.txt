@@ -26,23 +26,3 @@ if(WIN32)
         $<TARGET_FILE_DIR:${PROJECT_NAME}>
     )
 endif()
-
-# Copy the executable to the project root after compilation
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    $<TARGET_FILE:${PROJECT_NAME}>
-    "${CMAKE_SOURCE_DIR}/"
-    COMMENT "Copying executable to project root..."
-)
-
-if(WIN32)
-    # Check if we are using the shared library target
-    if(TARGET SDL3::SDL3-shared)
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<TARGET_FILE:SDL3::SDL3-shared>
-            "${CMAKE_SOURCE_DIR}/"
-            COMMENT "Copying SDL3.dll to project root..."
-        )
-    endif()
-endif()
