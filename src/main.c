@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
@@ -7,7 +9,7 @@
 #define PARTICLE_COUNT 20000
 #define GRAVITY 5
 #define BOUNCINESS 0.75
-#define FLOOR 50
+#define FLOOR 100
 
 typedef enum {
     TOP_LEFT,
@@ -22,6 +24,7 @@ typedef struct {
     SDL_FRect rect;
     float xvel;
     float yvel;
+    float bounce;
     Uint32 color;
     bool fill;
 } SimRect;
@@ -52,6 +55,20 @@ void UpdatePhysics(SimRect* p, double dt) {
 
 }
 
+// xvel: [-2048, 2047]
+// yvel: [-2048, 2047]
+// Color: [0x0, 0xFFFFFF]
+void UpdateColor(SimRect* p, double dt) {
+    // Map xvel, yvel :-> [0, 0xFF]
+    Uint16 xcol = p->xvel + 0x80; // [0, 255]
+    Uint16 ycol = p->yvel + 0x80; // [0, 255]
+    // [0, 0x1FC02]
+    Uint32 color = ((((xcol*xcol + ycol*ycol) / 0x1000)) << 24) | 0x0044FFFF;
+
+    p->color = color;
+
+}
+
 int RenderingThread(void* data) {
     RenderContext* ctx = (RenderContext*)data;
     Uint64 now = SDL_GetPerformanceCounter();
@@ -71,10 +88,9 @@ int RenderingThread(void* data) {
         for (Uint64 i = 0; i < PARTICLE_COUNT; i++) {
             SimRect* p = ctx->cells[i];
             
-            // 1. Update
             UpdatePhysics(p, deltaTime);
+            UpdateColor(p, deltaTime);
 
-            // 2. Draw
             Uint32 c = p->color;
             SDL_SetRenderDrawColor(ctx->renderer, (c>>24)&0xFF, (c>>16)&0xFF, (c>>8)&0xFF, c&0xFF);
             
@@ -99,11 +115,12 @@ void InitParticles(SimRect p[PARTICLE_COUNT], ParticleStartLocation loc) {
     }
 
     for (Uint64 i = 0; i < PARTICLE_COUNT; i++) {
-        p[i].rect = (SDL_FRect){startX, startY, 5.0f, 5.0f};
+        p[i].rect = (SDL_FRect){startX, startY, (float)((SDL_rand(0xE) + 2)), (float)((SDL_rand(0xE) + 2))};
         // Give each particle a unique random velocity
-        p[i].xvel = (float)((SDL_rand(1000) - 500)); 
-        p[i].yvel = (float)((SDL_rand(1000) - 500));
-        p[i].color = (SDL_rand(0xFFFFFF) << 8) | 0xFF;
+        p[i].xvel = (float)((SDL_rand(0xFF) - 0x80)); 
+        p[i].yvel = (float)((SDL_rand(0xFF) - 0x80));
+        p[i].color = 0x000000FF;
+        p[i].bounce = (double)rand() / (double)RAND_MAX;
         p[i].fill = true;
     }
 }
@@ -117,6 +134,7 @@ int main(int argc, char* argv[]) {
 }
 
     SDL_srand(0);
+    srand(time(NULL));
 
     SimRect particles[PARTICLE_COUNT];
     InitParticles(particles, MID_CENTER);
