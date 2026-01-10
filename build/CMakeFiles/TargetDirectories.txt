@@ -1,8 +1,0 @@
-C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/CMakeFiles/SDL3-PARTICLE-SIMULATOR.dir
-C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/CMakeFiles/SDL3-shared.dir
-C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/CMakeFiles/SDL3-static.dir
-C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/CMakeFiles/SDL3_test.dir
-C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/CMakeFiles/SDL_uclibc.dir
-C:/Users/vigna/Desktop/Dani/Projects/SDL3-Particle-Simulator/build/deps/SDL/CMakeFiles/ALL_BUILD.dir
